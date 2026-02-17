@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Public Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        :root { --teal:#0d9488; --teal-dark:#0f766e; --teal-light:#14b8a6; }
+        * { box-sizing:border-box; }
+        body { font-family:'Sarabun',sans-serif; background:#f0fafb; min-height:100vh; }
+
+        .navbar { background:linear-gradient(135deg,#064e3b 0%,#065f46 40%,#0f766e 100%); box-shadow:0 4px 24px rgba(6,78,59,.35); }
+        .navbar-brand-main { font-size:1.45rem; font-weight:800; letter-spacing:.02em; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.25); }
+        .navbar-brand-sub  { font-size:.78rem; color:#a7f3d0; font-weight:500; letter-spacing:.04em; }
+        .navbar-logo { background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.35); border-radius:12px; padding:8px 10px; }
+
+        .glass-panel { background:rgba(255,255,255,.98); border-radius:1.25rem; box-shadow:0 8px 40px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04); border:1px solid rgba(226,232,240,.8); }
+
+        .btn-primary { background:linear-gradient(135deg,#0f766e,#0d9488,#14b8a6); color:#fff; font-weight:700; padding:.6rem 1.5rem; border-radius:.75rem; border:none; cursor:pointer; transition:all .25s; box-shadow:0 4px 14px rgba(13,148,136,.35); display:inline-flex; align-items:center; gap:.4rem; font-family:'Sarabun',sans-serif; font-size:1rem; }
+        .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(13,148,136,.45); }
+        .btn-primary:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+        .btn-sec { background:#fff; color:#374151; font-weight:600; padding:.55rem 1.2rem; border-radius:.75rem; border:1.5px solid #e5e7eb; cursor:pointer; transition:all .2s; font-family:'Sarabun',sans-serif; }
+        .btn-sec:hover { background:#f9fafb; border-color:#d1d5db; }
+
+        .input-field { width:100%; padding:.65rem 1rem; border:1.5px solid #e5e7eb; border-radius:.625rem; font-family:'Sarabun',sans-serif; font-size:.95rem; background:#fff; transition:all .2s; outline:none; }
+        .input-field:focus { border-color:#14b8a6; box-shadow:0 0 0 3px rgba(20,184,166,.12); }
+        .input-field::placeholder { color:#9ca3af; }
+
+        .nav-card { background:#fff; border:2px solid #e5e7eb; border-radius:1.25rem; padding:1.5rem 1rem; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all .3s; min-height:10rem; text-align:center; position:relative; overflow:hidden; }
+        .nav-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; border-radius:0 0 1.25rem 1.25rem; opacity:0; transition:opacity .3s; }
+        .nav-card:hover { transform:translateY(-5px); box-shadow:0 16px 32px rgba(0,0,0,.1); }
+        .nav-card.teal:hover  { border-color:#14b8a6; background:#f0fdfa; } .nav-card.teal::after  { background:linear-gradient(90deg,#14b8a6,#0d9488); }
+        .nav-card.blue:hover  { border-color:#3b82f6; background:#eff6ff; } .nav-card.blue::after  { background:linear-gradient(90deg,#3b82f6,#1d4ed8); }
+        .nav-card.purple:hover{ border-color:#8b5cf6; background:#f5f3ff; } .nav-card.purple::after{ background:linear-gradient(90deg,#8b5cf6,#6d28d9); }
+        .nav-card.gray:hover  { border-color:#6b7280; background:#f9fafb; } .nav-card.gray::after  { background:linear-gradient(90deg,#6b7280,#374151); }
+        .nav-card:hover::after { opacity:1; }
+        .nav-icon { width:3.25rem; height:3.25rem; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:.875rem; font-size:1.3rem; transition:transform .3s; }
+        .nav-card:hover .nav-icon { transform:scale(1.15) rotate(-5deg); }
+
+        .stat-card { background:#fff; border-radius:1rem; padding:1.4rem 1.6rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border:1px solid #f1f5f9; position:relative; overflow:hidden; transition:all .3s; }
+        .stat-card:hover { box-shadow:0 8px 28px rgba(0,0,0,.1); transform:translateY(-2px); }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+        .stat-card.green::before  { background:linear-gradient(90deg,#22c55e,#86efac); }
+        .stat-card.blue::before   { background:linear-gradient(90deg,#3b82f6,#93c5fd); }
+        .stat-card.amber::before  { background:linear-gradient(90deg,#f59e0b,#fcd34d); }
+        .stat-card.purple::before { background:linear-gradient(90deg,#8b5cf6,#c4b5fd); }
+
+        .dash-card { background:#fff; border-radius:1rem; padding:1.4rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border:1px solid #f1f5f9; }
+
+        .sec-hd { font-size:1rem; font-weight:700; color:#1e293b; padding-left:.8rem; position:relative; margin-bottom:1rem; }
+        .sec-hd::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:9999px; }
+        .sec-hd.teal::before   { background:linear-gradient(180deg,#14b8a6,#0f766e); }
+        .sec-hd.blue::before   { background:linear-gradient(180deg,#3b82f6,#1d4ed8); }
+        .sec-hd.purple::before { background:linear-gradient(180deg,#8b5cf6,#6d28d9); }
+        .sec-hd.pink::before   { background:linear-gradient(180deg,#ec4899,#be185d); }
+        .sec-hd.amber::before  { background:linear-gradient(180deg,#f59e0b,#d97706); }
+        .sec-hd.red::before    { background:linear-gradient(180deg,#ef4444,#dc2626); }
+        .sec-hd.indigo::before { background:linear-gradient(180deg,#6366f1,#4338ca); }
+        .sec-hd.gray::before   { background:linear-gradient(180deg,#64748b,#334155); }
+
+        .badge { padding:.2rem .75rem; border-radius:9999px; font-size:.72rem; font-weight:700; letter-spacing:.04em; }
+        .badge-green  { background:#dcfce7; color:#166534; }
+        .badge-blue   { background:#dbeafe; color:#1e3a8a; }
+        .badge-purple { background:#ede9fe; color:#4c1d95; }
+        .badge-amber  { background:#fef3c7; color:#92400e; }
+        .badge-red    { background:#fee2e2; color:#991b1b; }
+
+        .data-tbl { width:100%; border-collapse:collapse; font-size:.875rem; }
+        .data-tbl thead th { background:#f8fafc; color:#64748b; font-weight:600; text-transform:uppercase; font-size:.7rem; letter-spacing:.05em; padding:.65rem .875rem; border-bottom:1px solid #e2e8f0; }
+        .data-tbl tbody td { padding:.65rem .875rem; border-bottom:1px solid #f1f5f9; color:#374151; }
+        .data-tbl tbody tr:hover { background:#f8fafc; }
+        .data-tbl tbody tr:last-child td { border-bottom:none; }
+
+        /* Item Analysis special table */
+        .item-tbl { width:100%; border-collapse:collapse; font-size:.85rem; }
+        .item-tbl th, .item-tbl td { padding:.55rem .6rem; border:1px solid #e2e8f0; text-align:center; }
+        .item-tbl thead tr:first-child th { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+        .item-tbl thead tr:last-child th  { font-size:.68rem; font-weight:600; padding:.35rem .5rem; }
+        .item-tbl tbody tr:hover { filter:brightness(.97); }
+        .item-tbl tfoot td { font-weight:700; font-size:.82rem; border-top:2px solid #cbd5e1; }
+        .cell-q    { text-align:left !important; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .cell-num  { font-size:.78rem; color:#6b7280; display:block; margin-top:1px; }
+
+        .q-opt { width:100%; text-align:left; padding:.9rem 1.1rem; border-radius:.875rem; border:2px solid #e5e7eb; cursor:pointer; transition:all .2s; background:#fff; display:flex; align-items:center; gap:.75rem; font-family:'Sarabun',sans-serif; font-size:.975rem; color:#374151; }
+        .q-opt:hover { border-color:#a7f3d0; background:#f0fdf9; }
+        .q-opt.sel-pre  { border-color:#10b981; background:#ecfdf5; color:#065f46; }
+        .q-opt.sel-post { border-color:#3b82f6; background:#eff6ff; color:#1e3a8a; }
+        .q-num { width:1.85rem; height:1.85rem; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; flex-shrink:0; transition:all .2s; }
+        .q-opt.sel-pre .q-num  { background:#10b981; color:#fff; border-color:#10b981; }
+        .q-opt.sel-post .q-num { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+
+        .prog-bar  { height:6px; background:#e5e7eb; border-radius:9999px; overflow:hidden; }
+        .prog-fill { height:100%; border-radius:9999px; transition:width .4s ease; }
+
+        .sat-btn { width:2.4rem; height:2.4rem; border-radius:.5rem; border:2px solid #e5e7eb; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; font-size:.82rem; font-weight:700; color:#9ca3af; background:#fff; }
+        .sat-btn:hover { border-color:#a78bfa; color:#7c3aed; background:#f5f3ff; }
+        .sat-btn.act { background:#7c3aed; border-color:#7c3aed; color:#fff; transform:scale(1.12); box-shadow:0 4px 12px rgba(124,58,237,.35); }
+
+        .cscroll::-webkit-scrollbar { width:5px; height:5px; }
+        .cscroll::-webkit-scrollbar-track { background:#f1f5f9; border-radius:9999px; }
+        .cscroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:9999px; }
+
+        .ai-box { background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%); border:1px solid #c7d2fe; border-radius:1.25rem; padding:1.6rem; }
+
+        .imp-chip { display:inline-block; padding:.18rem .55rem; border-radius:9999px; font-size:.72rem; font-weight:700; }
+
+        .user-search-card { padding:.875rem 1rem; border:2px solid #e5e7eb; border-radius:.875rem; cursor:pointer; transition:all .2s; display:flex; justify-content:space-between; align-items:center; }
+        .user-search-card:hover { border-color:#93c5fd; background:#eff6ff; box-shadow:0 4px 12px rgba(59,130,246,.1); }
+        .user-search-card.done { border-color:#a7f3d0; background:#f0fdf9; }
+        .user-search-card.done:hover { border-color:#34d399; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .page-in { animation:fadeUp .3s ease; }
+    </style>
+</head>
+<body>
+<div id="app" class="min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <nav class="navbar text-white sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="navbar-logo"><i class="fa-solid fa-heart-pulse text-2xl text-white"></i></div>
+                <div>
+                    <div class="navbar-brand-main"> โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน 1/2569</div>
+                    <div class="navbar-brand-main">AI in Public Health “ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข”</div>
+                    <div class="navbar-brand-main">นายจรัญญู ทองเอนก</div>
+                </div>
+            </div>
+            <button v-if="currentPage !== 'dashboard'" @click="loadDashboard"
+                class="text-sm bg-white/15 hover:bg-white/25 border border-white/25 px-4 py-2 rounded-xl transition flex items-center gap-2 font-semibold">
+                <i class="fa-solid fa-house text-xs"></i><span class="hidden sm:inline">หน้าหลัก</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <!-- MODAL: Admin -->
+        <div v-if="showAdminLogin" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" @click.self="showAdminLogin=false">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 page-in">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-solid fa-user-shield text-2xl text-gray-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">ผู้ดูแลระบบ</h3>
+                </div>
+                <div class="space-y-3 mb-6">
+                    <input v-model="adminUser" placeholder="Username" class="input-field" @keyup.enter="adminLogin">
+                    <input v-model="adminPass" type="password" placeholder="Password" class="input-field" @keyup.enter="adminLogin">
+                </div>
+                <div class="flex gap-3">
+                    <button @click="showAdminLogin=false" class="btn-sec flex-1">ยกเลิก</button>
+                    <button @click="adminLogin" class="btn-primary flex-1 justify-center">
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════ DASHBOARD ══════════════ -->
+        <div v-if="currentPage==='dashboard'" class="max-w-7xl mx-auto page-in">
+
+            <!-- Nav Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div class="nav-card teal" @click="startPreTest">
+                    <div class="nav-icon bg-teal-50 text-teal-600"><i class="fa-solid fa-file-pen"></i></div>
+                    <div class="font-bold text-gray-700 text-sm leading-snug">แบบทดสอบ<br><span class="text-teal-600 text-base">ก่อนเรียน (Pre)</span></div>
+                </div>
+                <div class="nav-card blue" @click="goToPostTestSearch">
+                    <div class="nav-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="font-bold text-gray-700 text-sm leading-snug">แบบทดสอบ<br><span class="text-blue-600 text-base">หลังเรียน (Post)</span></div>
+                </div>
+                <div class="nav-card purple" @click="goToSatisfaction">
+                    <div class="nav-icon bg-purple-50 text-purple-600"><i class="fa-regular fa-star"></i></div>
+                    <div class="font-bold text-gray-700 text-sm leading-snug">ประเมิน<br><span class="text-purple-600 text-base">ความพึงพอใจ</span></div>
+                </div>
+                <div class="nav-card gray" @click="showAdminLogin=true">
+                    <div class="nav-icon bg-gray-100 text-gray-600"><i class="fa-solid fa-lock"></i></div>
+                    <div class="font-bold text-gray-700 text-sm leading-snug">ผู้บริหาร/<br><span class="text-gray-600 text-base">Admin</span></div>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-teal-600"></i> สรุปผลการดำเนินงาน
+                    </h2>
+                    <p class="text-gray-400 text-sm mt-0.5">Dashboard แสดงผลข้อมูล Real-time</p>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button @click="loadDashboard" class="btn-sec text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right text-xs"></i> Refresh
+                    </button>
+                    <button @click="exportToExcel" class="text-sm bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Export
+                    </button>
+                    <button @click="generateAIReport" class="text-sm font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2 text-white"
+                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea)">
+                        <i class="fa-solid fa-robot"></i> AI Summary
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="stat-card green">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">ผู้เข้าอบรม</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalUsers }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">คน</p>
+                        </div>
+                        <div class="bg-green-50 p-2 rounded-lg text-green-500"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Pre-test เฉลี่ย</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.avgPre.toFixed(2) }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">/ 10 คะแนน</p>
+                        </div>
+                        <div class="bg-blue-50 p-2 rounded-lg text-blue-500"><i class="fa-solid fa-clipboard-question"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Post-test เฉลี่ย</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.avgPost.toFixed(2) }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">/ 10 คะแนน</p>
+                        </div>
+                        <div class="bg-amber-50 p-2 rounded-lg text-amber-500"><i class="fa-solid fa-award"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">ความพึงพอใจ</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.avgSat.toFixed(1) }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">% (เต็ม 100%)</p>
+                        </div>
+                        <div class="bg-purple-50 p-2 rounded-lg text-purple-500"><i class="fa-solid fa-heart"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Report -->
+            <div v-if="aiReport" class="ai-box mb-8 page-in">
+                <h3 class="text-base font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                    <span class="w-7 h-7 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-sparkles text-white text-xs"></i>
+                    </span>
+                    AI Executive Summary
+                </h3>
+                <div class="text-gray-700 whitespace-pre-line leading-relaxed text-sm">{{ aiReport }}</div>
+            </div>
+
+            <!-- Satisfaction Chart -->
+            <div class="dash-card mb-6">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h4 class="sec-hd purple mb-0">คะแนนความพึงพอใจรายข้อ (เฉลี่ย / 5)</h4>
+                    <span class="badge badge-green">Overall: {{ satAvgDisplay }} / 5.00 ({{ stats.avgSat.toFixed(1) }}%)</span>
+                </div>
+                <div style="height:300px"><canvas id="chartSat"></canvas></div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="dash-card">
+                    <h4 class="sec-hd teal">Pre vs Post (Paired t-test)</h4>
+                    <div style="height:190px"><canvas id="chartPrePost"></canvas></div>
+                    <div class="mt-3 bg-gray-50 rounded-xl p-3 text-center text-xs border border-gray-100">
+                        <div class="grid grid-cols-2 gap-1 text-gray-500 mb-1.5">
+                            <div>t = <b class="text-gray-700">{{ stats.tTest.t.toFixed(4) }}</b></div>
+                            <div>p = <b class="text-gray-700">{{ stats.tTest.p < 0.001 ? '< 0.001' : stats.tTest.p.toFixed(4) }}</b></div>
+                        </div>
+                        <div v-if="stats.tTest.p < 0.05 && stats.tTest.t !== 0" class="text-green-600 font-bold">
+                            <i class="fa-solid fa-circle-check mr-1"></i>Significant (p&lt;0.05)
+                        </div>
+                        <div v-else class="text-gray-400">Not Significant / Insufficient data</div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h4 class="sec-hd pink">เพศ (จำนวน / ร้อยละ)</h4>
+                    <div style="height:190px" class="flex justify-center"><canvas id="chartSex"></canvas></div>
+                </div>
+                <div class="dash-card">
+                    <h4 class="sec-hd amber">ช่วงอายุ (Age Distribution)</h4>
+                    <div style="height:190px" class="flex justify-center"><canvas id="chartAge"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Stat Tables -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="dash-card">
+                    <h4 class="sec-hd indigo">เปรียบเทียบเพศ (Independent t-test)</h4>
+                    <table class="data-tbl">
+                        <thead><tr><th class="text-left">เพศ</th><th>N</th><th>Mean (Post)</th><th>SD</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="flex items-center gap-2"><span class="w-2 h-2 bg-blue-400 rounded-full"></span>ชาย</span></td>
+                                <td class="text-center font-semibold">{{ stats.sexTest.maleN }}</td>
+                                <td class="text-center font-semibold text-blue-600">{{ stats.sexTest.maleMean.toFixed(2) }}</td>
+                                <td class="text-center text-gray-500">{{ stats.sexTest.maleSD.toFixed(2) }}</td>
+                            </tr>
+                            <tr>
+                                <td><span class="flex items-center gap-2"><span class="w-2 h-2 bg-pink-400 rounded-full"></span>หญิง</span></td>
+                                <td class="text-center font-semibold">{{ stats.sexTest.femaleN }}</td>
+                                <td class="text-center font-semibold text-pink-600">{{ stats.sexTest.femaleMean.toFixed(2) }}</td>
+                                <td class="text-center text-gray-500">{{ stats.sexTest.femaleSD.toFixed(2) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-2 flex justify-between items-center text-xs text-gray-400">
+                        <span>t = {{ stats.sexTest.t.toFixed(4) }}, p = {{ stats.sexTest.p.toFixed(4) }}</span>
+                        <span v-if="stats.sexTest.maleN < 2 || stats.sexTest.femaleN < 2" class="italic">ข้อมูลไม่เพียงพอ</span>
+                        <span v-else-if="stats.sexTest.p < 0.05" class="badge badge-green">Significant</span>
+                        <span v-else>Not Significant</span>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h4 class="sec-hd amber">เปรียบเทียบช่วงอายุ (One-way ANOVA)</h4>
+                    <div class="max-h-40 overflow-y-auto cscroll">
+                        <table class="data-tbl">
+                            <thead><tr><th class="text-left">ช่วงอายุ</th><th>N</th><th>Mean</th></tr></thead>
+                            <tbody>
+                                <tr v-for="(g,k) in stats.anova.groups" :key="k">
+                                    <td class="font-medium">{{ k }}</td>
+                                    <td class="text-center">{{ g.n }}</td>
+                                    <td class="text-center font-semibold text-amber-600">{{ g.mean.toFixed(2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-400 text-right">F = {{ stats.anova.f.toFixed(2) }}, p = {{ stats.anova.p.toFixed(4) }}</div>
+                </div>
+            </div>
+
+            <!-- ══ Item Analysis ══ -->
+            <div class="dash-card mb-6">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h4 class="sec-hd red mb-0">วิเคราะห์รายข้อ (Item Analysis)</h4>
+                    <div class="flex gap-2 text-xs flex-wrap">
+                        <span class="badge badge-red">Pre: {{ stats.totalPre }} คน</span>
+                        <span class="badge badge-blue">Post: {{ stats.totalPost }} คน</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto cscroll">
+                    <table class="item-tbl">
+                        <thead>
+                            <!-- Row 1: group headers -->
+                            <tr>
+                                <th rowspan="2" style="background:#f8fafc;min-width:2rem">ข้อ</th>
+                                <th rowspan="2" style="background:#f8fafc;text-align:left;min-width:180px">คำถาม</th>
+                                <th colspan="2" style="background:#fef2f2;color:#b91c1c">
+                                    <i class="fa-solid fa-circle-question mr-1"></i>Pre-test
+                                </th>
+                                <th colspan="2" style="background:#eff6ff;color:#1d4ed8">
+                                    <i class="fa-solid fa-graduation-cap mr-1"></i>Post-test
+                                </th>
+                                <th rowspan="2" style="background:#f0fdf4;color:#15803d;min-width:80px">
+                                    พัฒนาการ<br><span style="font-size:.65rem;font-weight:400">(% ผิดลดลง)</span>
+                                </th>
+                            </tr>
+                            <!-- Row 2: sub-headers -->
+                            <tr>
+                                <th style="background:#f0fdf4;color:#15803d;min-width:70px">
+                                    <i class="fa-solid fa-check text-green-500 mr-1"></i>ถูก
+                                </th>
+                                <th style="background:#fff1f2;color:#b91c1c;min-width:70px">
+                                    <i class="fa-solid fa-xmark text-red-500 mr-1"></i>ผิด
+                                </th>
+                                <th style="background:#f0fdf4;color:#1d4ed8;min-width:70px">
+                                    <i class="fa-solid fa-check text-blue-500 mr-1"></i>ถูก
+                                </th>
+                                <th style="background:#faf5ff;color:#6d28d9;min-width:70px">
+                                    <i class="fa-solid fa-xmark text-purple-500 mr-1"></i>ผิด
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(q,idx) in questions" :key="idx">
+                                <!-- ข้อที่ -->
+                                <td style="background:#f8fafc;font-weight:700;color:#94a3b8;font-size:.8rem">{{ idx+1 }}</td>
+                                <!-- คำถาม -->
+                                <td class="cell-q" style="background:#f8fafc" :title="q.q">{{ q.q }}</td>
+
+                                <!-- Pre ถูก -->
+                                <td style="background:#f0fdf4">
+                                    <span class="font-bold text-green-700">
+                                        {{ stats.totalPre > 0 ? stats.itemAnalysis.preCorrect[idx] : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-500">
+                                        {{ pct(stats.itemAnalysis.preCorrect[idx], stats.totalPre) }}%
+                                    </span>
+                                </td>
+                                <!-- Pre ผิด -->
+                                <td style="background:#fff1f2">
+                                    <span class="font-bold text-red-600">
+                                        {{ stats.totalPre > 0 ? stats.itemAnalysis.preWrong[idx] : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-400">
+                                        {{ pct(stats.itemAnalysis.preWrong[idx], stats.totalPre) }}%
+                                    </span>
+                                </td>
+                                <!-- Post ถูก -->
+                                <td style="background:#eff6ff">
+                                    <span class="font-bold text-blue-700">
+                                        {{ stats.totalPost > 0 ? stats.itemAnalysis.postCorrect[idx] : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-500">
+                                        {{ pct(stats.itemAnalysis.postCorrect[idx], stats.totalPost) }}%
+                                    </span>
+                                </td>
+                                <!-- Post ผิด -->
+                                <td style="background:#faf5ff">
+                                    <span class="font-bold text-purple-700">
+                                        {{ stats.totalPost > 0 ? stats.itemAnalysis.postWrong[idx] : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-400">
+                                        {{ pct(stats.itemAnalysis.postWrong[idx], stats.totalPost) }}%
+                                    </span>
+                                </td>
+                                <!-- พัฒนาการ -->
+                                <td style="background:#f0fdf4">
+                                    <span v-if="stats.totalPre > 0 || stats.totalPost > 0" class="imp-chip"
+                                        :class="parseFloat(stats.itemAnalysis.improvement[idx]) > 0
+                                            ? 'bg-green-100 text-green-700'
+                                            : parseFloat(stats.itemAnalysis.improvement[idx]) < 0
+                                                ? 'bg-red-100 text-red-600'
+                                                : 'bg-gray-100 text-gray-500'">
+                                        {{ parseFloat(stats.itemAnalysis.improvement[idx]) >= 0 ? '+' : '' }}{{ stats.itemAnalysis.improvement[idx] }}%
+                                    </span>
+                                    <span v-else class="text-gray-300 text-xs">—</span>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <!-- Footer รวมเฉลี่ย -->
+                        <tfoot v-if="stats.totalPre > 0 || stats.totalPost > 0">
+                            <tr>
+                                <td colspan="2" style="background:#f1f5f9;text-align:right;color:#475569;font-size:.78rem;padding:.55rem .875rem">
+                                    <i class="fa-solid fa-sigma mr-1"></i>รวมเฉลี่ย / ข้อ
+                                </td>
+                                <!-- Pre ถูก avg -->
+                                <td style="background:#dcfce7">
+                                    <span class="font-bold text-green-800">
+                                        {{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preCorrect)/10).toFixed(1) : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-600">
+                                        {{ pct(sumArr(stats.itemAnalysis.preCorrect)/10, stats.totalPre) }}%
+                                    </span>
+                                </td>
+                                <!-- Pre ผิด avg -->
+                                <td style="background:#fecaca">
+                                    <span class="font-bold text-red-800">
+                                        {{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preWrong)/10).toFixed(1) : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-600">
+                                        {{ pct(sumArr(stats.itemAnalysis.preWrong)/10, stats.totalPre) }}%
+                                    </span>
+                                </td>
+                                <!-- Post ถูก avg -->
+                                <td style="background:#bfdbfe">
+                                    <span class="font-bold text-blue-800">
+                                        {{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postCorrect)/10).toFixed(1) : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-600">
+                                        {{ pct(sumArr(stats.itemAnalysis.postCorrect)/10, stats.totalPost) }}%
+                                    </span>
+                                </td>
+                                <!-- Post ผิด avg -->
+                                <td style="background:#e9d5ff">
+                                    <span class="font-bold text-purple-800">
+                                        {{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postWrong)/10).toFixed(1) : '—' }}
+                                    </span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-600">
+                                        {{ pct(sumArr(stats.itemAnalysis.postWrong)/10, stats.totalPost) }}%
+                                    </span>
+                                </td>
+                                <!-- พัฒนาการเฉลี่ย -->
+                                <td style="background:#bbf7d0">
+                                    <span v-if="stats.totalPre > 0 && stats.totalPost > 0" class="imp-chip bg-green-200 text-green-800">
+                                        {{ parseFloat(avgImprovement) >= 0 ? '+' : '' }}{{ avgImprovement }}%
+                                    </span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- User List -->
+                <div class="dash-card">
+                    <h4 class="sec-hd gray">รายชื่อผู้เข้าอบรม</h4>
+                    <div class="relative mb-3">
+                        <input v-model="userSearch" placeholder="ค้นหาชื่อ / หน่วยงาน..." class="input-field pr-8 text-sm">
+                        <i class="fa-solid fa-search absolute right-3 top-3 text-gray-300 text-xs"></i>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto cscroll">
+                        <table class="data-tbl">
+                            <thead><tr><th class="text-left">ชื่อ</th><th>หน่วยงาน</th><th class="text-center">Pre</th><th class="text-center">Post</th></tr></thead>
+                            <tbody>
+                                <tr v-for="u in filteredUserList" :key="u.id">
+                                    <td>
+                                        <div class="font-semibold text-gray-700 text-sm">{{ u.name }}</div>
+                                        <div class="text-xs text-gray-400" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.address }}</div>
+                                    </td>
+                                    <td class="text-center text-xs text-gray-500">{{ u.unit }}</td>
+                                    <td class="text-center">
+                                        <span v-if="u.pre !== null" class="text-sm font-bold text-gray-700">{{ u.pre }}</span>
+                                        <span v-else class="text-xs text-gray-300">—</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span v-if="u.post !== null" class="text-sm font-bold text-blue-600">{{ u.post }}</span>
+                                        <span v-else class="text-xs text-red-300">—</span>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredUserList.length === 0">
+                                    <td colspan="4" class="text-center text-gray-400 py-6 text-sm italic">ไม่พบรายชื่อที่ค้นหา</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Suggestions -->
+                <div class="dash-card">
+                    <h4 class="sec-hd purple">ข้อเสนอแนะจากผู้เข้าอบรม</h4>
+                    <div class="max-h-72 overflow-y-auto cscroll space-y-2">
+                        <div v-for="(s,i) in stats.suggestions" :key="i"
+                            class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-3 text-sm text-gray-700 italic">
+                            <i class="fa-solid fa-quote-left text-purple-200 mr-1 text-xs"></i>{{ s }}
+                        </div>
+                        <div v-if="stats.suggestions.length===0" class="text-center text-gray-400 py-8 text-sm">
+                            <i class="fa-regular fa-comment-dots text-2xl mb-2 block opacity-40"></i>ยังไม่มีข้อเสนอแนะ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════ REGISTER ══════════════ -->
+        <div v-if="currentPage==='register'" class="max-w-4xl mx-auto glass-panel p-8 page-in">
+            <div class="flex items-center gap-4 mb-7 pb-5 border-b border-gray-100">
+                <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-xl">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">ลงทะเบียนข้อมูลส่วนตัว</h2>
+                    <p class="text-gray-400 text-sm">กรอกข้อมูลเพื่อเริ่มทำแบบทดสอบ Pre-test</p>
+                </div>
+            </div>
+            <form @submit.prevent="submitRegistration" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ-สกุล <span class="text-red-500">*</span></label>
+                        <input v-model="form.name" required class="input-field" placeholder="ระบุคำนำหน้าและชื่อ-สกุล">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">เพศ <span class="text-red-500">*</span></label>
+                            <select v-model="form.sex" required class="input-field">
+                                <option value="">เลือกเพศ</option>
+                                <option>ชาย</option><option>หญิง</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">อายุ (ปี) <span class="text-red-500">*</span></label>
+                            <input v-model.number="form.age" type="number" required class="input-field" min="1" max="100" placeholder="25">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">หน่วยงาน <span class="text-red-500">*</span></label>
+                        <input v-model="form.unit" required class="input-field" placeholder="เช่น รพ.สต.บ้านนา">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">ตำแหน่ง <span class="text-red-500">*</span></label>
+                        <input v-model="form.position" required class="input-field" placeholder="เช่น นักวิชาการสาธารณสุข">
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-gray-50 to-teal-50/30 p-5 rounded-xl border border-gray-100">
+                    <h3 class="font-bold text-teal-700 mb-4 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-map-location-dot"></i> ที่อยู่ปัจจุบัน
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">บ้านเลขที่</label>
+                            <input v-model="form.houseNo" class="input-field" placeholder="-">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">หมู่ที่</label>
+                            <input v-model="form.moo" class="input-field" placeholder="-">
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">ตำบล <span class="text-red-500">*</span></label>
+                                <input v-model="form.tambon" required class="input-field" placeholder="ระบุตำบล">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">อำเภอ <span class="text-red-500">*</span></label>
+                                <input v-model="form.amphure" required class="input-field" placeholder="ระบุอำเภอ">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">จังหวัด <span class="text-red-500">*</span></label>
+                            <input v-model="form.province" required class="input-field" placeholder="ระบุจังหวัด">
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-2 pt-4 border-t border-gray-100 flex justify-center">
+                    <button type="submit" class="btn-primary px-12 py-3" style="font-size:1.05rem">
+                        เริ่มทำแบบทดสอบ <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ══════════════ SEARCH ══════════════ -->
+        <div v-if="currentPage==='search'" class="max-w-xl mx-auto glass-panel p-8 page-in">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl mx-auto mb-3">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">ค้นหาสำหรับ Post-test</h2>
+                <p class="text-gray-400 text-sm mt-1">พิมพ์ชื่อที่ลงทะเบียนไว้ใน Pre-test</p>
+            </div>
+            <div class="flex gap-2 mb-4">
+                <input v-model="searchQuery" @keyup.enter="performSearch" placeholder="พิมพ์ชื่อของคุณ..." class="input-field flex-1">
+                <button @click="performSearch" class="btn-primary px-5 whitespace-nowrap"><i class="fa-solid fa-search"></i></button>
+            </div>
+            <div v-if="isSearching" class="text-center py-6 text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i>กำลังค้นหา...
+            </div>
+            <ul v-if="searchResults.length > 0" class="space-y-2 mt-4">
+                <li v-for="user in searchResults" :key="user.userId"
+                    class="user-search-card" :class="user.hasPost ? 'done' : ''"
+                    @click="startPostTest(user)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
+                            :style="user.hasPost ? 'background:linear-gradient(135deg,#10b981,#059669)' : 'background:linear-gradient(135deg,#3b82f6,#1d4ed8)'">
+                            {{ user.name.charAt(0) }}
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800 text-sm">{{ user.name }}</div>
+                            <div class="text-xs text-gray-400">{{ user.info }}</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1">
+                        <span v-if="user.hasPost" class="badge badge-green text-xs">
+                            <i class="fa-solid fa-check mr-1"></i>ทำ Post แล้ว
+                        </span>
+                        <span v-else class="badge badge-amber text-xs">
+                            <i class="fa-solid fa-clock mr-1"></i>ยังไม่ได้ทำ Post
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>
+                </li>
+            </ul>
+            <div v-if="searchResults.length===0 && hasSearched" class="text-center py-6 text-red-500 bg-red-50 rounded-xl border border-red-100 mt-4">
+                <i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i>
+                ไม่พบข้อมูล หรือท่านยังไม่ได้ทำ Pre-test
+            </div>
+        </div>
+
+        <!-- ══════════════ QUIZ ══════════════ -->
+        <div v-if="currentPage==='quiz'" class="max-w-3xl mx-auto glass-panel p-8 page-in">
+            <div class="flex justify-between items-start mb-5 pb-5 border-b border-gray-100">
+                <div>
+                    <span class="badge" :class="currentTestType==='Pre-test' ? 'badge-green' : 'badge-blue'">{{ currentTestType }}</span>
+                    <h2 class="text-xl font-bold mt-2 text-gray-800">แบบทดสอบวัดความรู้</h2>
+                    <p class="text-sm text-gray-400 mt-0.5">{{ form.name || 'ผู้ทดสอบ' }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-gray-700 tabular-nums">
+                        {{ currentQuestionIndex+1 }}<span class="text-lg text-gray-300">/{{ questions.length }}</span>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-0.5">ตอบแล้ว {{ answeredCount }}/{{ questions.length }}</div>
+                </div>
+            </div>
+            <div class="prog-bar mb-7">
+                <div class="prog-fill" :style="{width:((currentQuestionIndex+1)/questions.length*100)+'%',background:currentTestType==='Pre-test'?'linear-gradient(90deg,#10b981,#34d399)':'linear-gradient(90deg,#3b82f6,#60a5fa)'}"></div>
+            </div>
+            <div class="mb-8 min-h-72">
+                <p class="text-lg font-semibold mb-5 text-gray-800 leading-relaxed">{{ questions[currentQuestionIndex].q }}</p>
+                <div class="space-y-2.5">
+                    <button v-for="(opt,idx) in questions[currentQuestionIndex].options" :key="idx"
+                        @click="selectAnswer(idx)" class="q-opt"
+                        :class="answers[currentQuestionIndex]===idx?(currentTestType==='Pre-test'?'sel-pre':'sel-post'):''">
+                        <span class="q-num">{{ idx+1 }}</span><span>{{ opt }}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                <button v-if="currentQuestionIndex > 0" @click="currentQuestionIndex--" class="btn-sec flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left text-xs"></i> ย้อนกลับ
+                </button>
+                <div v-else></div>
+                <button v-if="currentQuestionIndex < questions.length-1" @click="nextQuestion" class="btn-primary" :disabled="answers[currentQuestionIndex]===undefined">
+                    ข้อถัดไป <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+                <button v-else @click="submitQuiz"
+                    class="font-bold px-6 py-2.5 rounded-xl text-white shadow transition flex items-center gap-2"
+                    style="background:linear-gradient(135deg,#f59e0b,#d97706);font-family:'Sarabun',sans-serif"
+                    :disabled="answers[currentQuestionIndex]===undefined">
+                    ส่งคำตอบ <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ══════════════ SATISFACTION ══════════════ -->
+        <div v-if="currentPage==='satisfaction'" class="max-w-4xl mx-auto glass-panel p-8 page-in">
+            <div class="text-center mb-7">
+                <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 text-2xl mx-auto mb-3">
+                    <i class="fa-regular fa-star"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">แบบประเมินความพึงพอใจ</h2>
+                <p class="text-gray-400 text-sm mt-1">โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน</p>
+            </div>
+            <div class="mb-5 bg-purple-50/60 p-4 rounded-xl border border-purple-100">
+                <label class="block text-sm font-semibold text-purple-800 mb-2">ชื่อผู้ประเมิน (ไม่ระบุได้)</label>
+                <input v-model="satForm.name" class="input-field bg-white" placeholder="ระบุชื่อ (Optional)">
+            </div>
+            <div class="flex justify-end text-xs text-gray-400 mb-3">1 = น้อยที่สุด &nbsp;→&nbsp; 5 = มากที่สุด</div>
+            <div class="space-y-2">
+                <div v-for="(q,idx) in satisfactionQuestions" :key="idx"
+                    class="bg-gray-50 hover:bg-purple-50/40 rounded-xl p-3.5 border border-gray-100 hover:border-purple-100 transition">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <p class="text-sm font-medium text-gray-700 flex-1">
+                            <span class="text-purple-600 font-bold mr-1">{{ idx+1 }}.</span> {{ q }}
+                        </p>
+                        <div class="flex gap-1.5 flex-shrink-0">
+                            <button v-for="s in 5" :key="s" @click="satForm.scores[idx]=s"
+                                class="sat-btn" :class="{ act: satForm.scores[idx]===s }">{{ s }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-6">
+                <label class="block font-semibold mb-2 text-gray-700">ข้อเสนอแนะเพิ่มเติม</label>
+                <textarea v-model="satForm.suggestion" class="input-field h-28" placeholder="ความคิดเห็นของท่านมีคุณค่า..."></textarea>
+            </div>
+            <button @click="submitSatisfaction"
+                class="w-full font-bold py-3.5 rounded-xl text-white text-base shadow-lg transition hover:opacity-90"
+                style="background:linear-gradient(135deg,#7c3aed,#9333ea);font-family:'Sarabun',sans-serif">
+                <i class="fa-solid fa-paper-plane mr-2"></i>ส่งแบบประเมิน
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 text-white py-5 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-semibold text-gray-300 text-sm">&copy; 2026 AI Public Health Project</p>
+            <p class="text-xs text-gray-600 mt-1">Developed by Jaranyu Thonganek | Powered by Gemini AI &amp; Google Cloud</p>
+        </div>
+    </footer>
+</div>
+
+<script>
+const { createApp, ref, reactive, computed, onMounted } = Vue;
+Chart.register(ChartDataLabels);
+
+const API_KEYS = [
+    "AIzaSyCWLJT4VknnhsKz_M0pP-ruWpkjLpYls2w",
+    "AIzaSyAuGmhGGfVIgdcBS-bDPu06I_fQpIy2Sng",
+    "AIzaSyAXn2RnKle5RdJsD74PHVQbQAcOkPffkb4",
+];
+const GEMINI_MODELS = [
+    { id:"gemini-2.5-flash", endpoint:"gemini-2.5-flash" },
+    { id:"gemini-2.5-pro",   endpoint:"gemini-2.5-pro" },
+    { id:"gemini-1.5-flash", endpoint:"gemini-1.5-flash" },
+    { id:"gemini-1.5-pro",   endpoint:"gemini-1.5-pro" },
+];
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-KkqUIO3-Y84Zl74ziErM39fivUrIlszEI7WaThAdwwVVB2yavQ0pBvBJqmt-9z3C/exec";
+
+/* ── Math helpers ── */
+const mean = a => a.length ? a.reduce((s,v)=>s+v,0)/a.length : 0;
+const variance = a => { if(a.length<2) return 0; const m=mean(a); return a.reduce((s,v)=>s+Math.pow(v-m,2),0)/(a.length-1); };
+const sd = a => Math.sqrt(variance(a));
+const sumArr = a => a.reduce((s,v)=>s+v,0);
+
+function welchT(a,b){
+    if(a.length<2||b.length<2) return {t:0,p:1};
+    const va=variance(a)/a.length, vb=variance(b)/b.length, se=Math.sqrt(va+vb);
+    if(se===0) return {t:0,p:1};
+    const t=(mean(a)-mean(b))/se;
+    const df=Math.pow(va+vb,2)/(Math.pow(va,2)/(a.length-1)+Math.pow(vb,2)/(b.length-1));
+    return {t, p:approxP(Math.abs(t),df)};
+}
+function pairedT(pre,post){
+    const d=pre.map((v,i)=>post[i]-v), m=mean(d), s=sd(d);
+    if(s===0||d.length<2) return {t:0,p:1};
+    const t=m/(s/Math.sqrt(d.length));
+    return {t, p:approxP(Math.abs(t),d.length-1)};
+}
+function approxP(t,df){
+    if(df<=0) return 1;
+    const x=df/(df+t*t);
+    return Math.min(2*0.5*ibeta(x,df/2,0.5),1);
+}
+function ibeta(x,a,b){
+    let r=0; const n=500, dx=x/n;
+    for(let i=0;i<n;i++){ const xi=(i+.5)*dx; r+=Math.pow(xi,a-1)*Math.pow(1-xi,b-1)*dx; }
+    return r/Math.exp(lgamma(a)+lgamma(b)-lgamma(a+b));
+}
+function lgamma(z){
+    const c=[76.18009173,-86.50532033,24.01409824,-1.23173957,.12086510e-2,-.53952394e-5];
+    let y=z,x=z,tmp=x+5.5; tmp-=(x+.5)*Math.log(tmp);
+    let s=1.00000000190015; c.forEach(ci=>s+=ci/++y);
+    return -tmp+Math.log(2.506628275*s/x);
+}
+
+createApp({
+    setup(){
+        const currentPage    = ref('dashboard');
+        const showAdminLogin = ref(false);
+        const adminUser      = ref('');
+        const adminPass      = ref('');
+        const userSearch     = ref('');
+
+        const form = reactive({ name:'',sex:'',age:'',unit:'',position:'',houseNo:'',moo:'',province:'',amphure:'',tambon:'' });
+        const satForm = reactive({ name:'',scores:Array(20).fill(0),suggestion:'' });
+
+        const currentTestType      = ref('Pre-test');
+        const currentUserId        = ref(null);
+        const currentQuestionIndex = ref(0);
+        const answers              = ref([]);
+
+        const searchQuery   = ref('');
+        const searchResults = ref([]);
+        const isSearching   = ref(false);
+        const hasSearched   = ref(false);
+        const aiReport      = ref('');
+        const cachedQuizData = ref([]);
+
+        const stats = reactive({
+            totalUsers:0, totalPre:0, totalPost:0,
+            avgPre:0, avgPost:0, avgSat:0,
+            tTest:   {t:0,p:1},
+            sexTest: {t:0,p:1,maleMean:0,femaleMean:0,maleSD:0,femaleSD:0,maleN:0,femaleN:0},
+            anova:   {f:0,p:1,groups:{}},
+            itemAnalysis:{
+                preWrong:   Array(10).fill(0),
+                postWrong:  Array(10).fill(0),
+                preCorrect: Array(10).fill(0),
+                postCorrect:Array(10).fill(0),
+                improvement:Array(10).fill('0.0')
+            },
+            userList:[], suggestions:[], satItemScores:[]
+        });
+
+        /* ── Computed ── */
+        const satAvgDisplay = computed(()=>{
+            if(!stats.satItemScores.length) return '0.00';
+            return (stats.satItemScores.reduce((a,b)=>a+parseFloat(b),0)/stats.satItemScores.length).toFixed(2);
+        });
+        const answeredCount = computed(()=>answers.value.filter(a=>a!==undefined).length);
+        const filteredUserList = computed(()=>{
+            const q=userSearch.value.toLowerCase().trim();
+            if(!q) return stats.userList;
+            return stats.userList.filter(u=>u.name.toLowerCase().includes(q)||(u.unit||'').toLowerCase().includes(q));
+        });
+        const avgImprovement = computed(()=>{
+            if(!stats.itemAnalysis.improvement.length) return '0.0';
+            const s=stats.itemAnalysis.improvement.reduce((a,b)=>a+parseFloat(b),0);
+            return (s/stats.itemAnalysis.improvement.length).toFixed(1);
+        });
+
+        /* helper: percent */
+        const pct = (n, total) => total > 0 ? ((n/total)*100).toFixed(0) : '0';
+
+        /* ── Questions ── */
+        const questions = [
+            { q:"1. AI (Artificial Intelligence) ในทางการแพทย์หมายถึงอะไร?", options:["หุ่นยนต์ผ่าตัดเท่านั้น","ระบบคอมพิวเตอร์ที่จำลองกระบวนการคิดของมนุษย์เพื่อแก้ปัญหา","โปรแกรมพิมพ์เอกสารอัตโนมัติ","การใช้อินเทอร์เน็ตความเร็วสูง"], correct:1 },
+            { q:"2. ข้อใดคือตัวอย่างการใช้ Machine Learning ในงานระบาดวิทยา?", options:["การบันทึกข้อมูลผู้ป่วยลงกระดาษ","การทำนายแนวโน้มการระบาดของไข้เลือดออก","การซ่อมแซมเครื่องมือแพทย์","การจัดตารางเวรพยาบาล"], correct:1 },
+            { q:"3. Chatbot สามารถช่วยงานสาธารณสุขชุมชนได้อย่างไร?", options:["ช่วยวินิจฉัยโรคขั้นสูงแทนแพทย์","ช่วยตอบคำถามสุขภาพเบื้องต้นและคัดกรองความเสี่ยง","ช่วยจ่ายยาตามความต้องการผู้ป่วย","ช่วยผ่าตัดเล็ก"], correct:1 },
+            { q:"4. ความท้าทายสำคัญของการใช้ AI ในหน่วยงานสาธารณสุขคืออะไร?", options:["AI ทำงานช้าเกินไป","AI ไม่มีวันผิดพลาด","ข้อมูลส่วนบุคคลและความเป็นส่วนตัว (Privacy)","AI ราคาถูกเกินไป"], correct:2 },
+            { q:"5. 'Hallucination' ในบริบทของ Generative AI หมายถึงอะไร?", options:["AI ป่วย","AI สร้างข้อมูลที่ดูสมจริงแต่ไม่ถูกต้อง","AI ทำงานหนักเกินไป","AI หยุดทำงาน"], correct:1 },
+            { q:"6. การใช้ AI วิเคราะห์ภาพถ่ายรังสี (X-ray) มีประโยชน์อย่างไร?", options:["แทนที่รังสีแพทย์ได้ 100%","ช่วยคัดกรองความผิดปกติเบื้องต้นและลดภาระงานแพทย์","ทำให้ภาพสวยขึ้น","ลดค่าใช้จ่ายในการซื้อเครื่อง X-ray"], correct:1 },
+            { q:"7. Predictive Analytics คืออะไร?", options:["การวิเคราะห์เพื่อทำนายเหตุการณ์ในอนาคตจากข้อมูลในอดีต","การสรุปรายงานประจำปี","การสำรวจความพึงพอใจ","การตรวจเช็คสต็อกยา"], correct:0 },
+            { q:"8. เทคโนโลยีใดที่มักทำงานร่วมกับ AI ในการติดตามสุขภาพผู้ป่วยระยะไกล?", options:["IoT (Internet of Things)","เครื่องพิมพ์ดีด","DVD Player","Fax"], correct:0 },
+            { q:"9. หากต้องการใช้ AI สรุปข้อมูลสุขภาพชุมชน ควรคำนึงถึงเรื่องใดเป็นอันดับแรก?", options:["ความสวยงามของกราฟ","ความถูกต้องของข้อมูล (Data Quality)","ความเร็วของอินเทอร์เน็ต","ยี่ห้อคอมพิวเตอร์"], correct:1 },
+            { q:"10. Personalized Medicine ที่ขับเคลื่อนด้วย AI คืออะไร?", options:["การรักษาแบบเหมาจ่าย","การรักษาที่ออกแบบเฉพาะบุคคลตามพันธุกรรมและข้อมูลสุขภาพ","การรักษาด้วยสมุนไพร","การรักษาทางไกล"], correct:1 },
+        ];
+
+        const satisfactionQuestions = [
+            "เนื้อหาตรงตามวัตถุประสงค์","วิทยากรมีความรู้ความเข้าใจ","การถ่ายทอดความรู้ชัดเจน","สื่อการสอนเหมาะสม","ระยะเวลาเหมาะสม",
+            "สถานที่/ระบบออนไลน์สะดวก","เอกสารประกอบการอบรม","การนำไปใช้ประโยชน์ได้จริง","ความทันสมัยของเนื้อหา","การตอบข้อซักถาม",
+            "ระบบลงทะเบียนใช้งานง่าย","แบบทดสอบมีความยากง่ายเหมาะสม","การให้บริการของเจ้าหน้าที่","ความเหมาะสมของอาหาร/เบรก","บรรยากาศการเรียนรู้",
+            "การแลกเปลี่ยนเรียนรู้","ความรู้ก่อนเทียบกับหลังอบรม","ความพึงพอใจภาพรวม","ท่านจะแนะนำหลักสูตรนี้ต่อ","ความคุ้มค่าของเวลาที่เสียไป"
+        ];
+
+        /* ── GAS ── */
+        async function runGas(action, data={}){
+            const r = await fetch(WEB_APP_URL,{ method:'POST', body:JSON.stringify({action,...data}) });
+            const res = await r.json();
+            if(res.error) throw new Error(res.error);
+            return res;
+        }
+
+        /* ── Navigation ── */
+        const startPreTest = () => { currentPage.value='register'; };
+        const submitRegistration = () => { currentTestType.value='Pre-test'; currentUserId.value=null; startQuiz(); };
+        const goToPostTestSearch = () => { currentPage.value='search'; searchQuery.value=''; searchResults.value=[]; hasSearched.value=false; };
+
+        const performSearch = () => {
+            isSearching.value=true; hasSearched.value=false;
+            runGas('searchUser',{nameQuery:searchQuery.value})
+                .then(users=>{
+                    const postIds = new Set(cachedQuizData.value.filter(r=>r[13]==='Post-test').map(r=>String(r[1])));
+                    searchResults.value = users.map(u=>({ ...u, hasPost: u.hasPost || postIds.has(String(u.userId)) }));
+                    isSearching.value=false; hasSearched.value=true;
+                })
+                .catch(()=>{ isSearching.value=false; hasSearched.value=true; });
+        };
+
+        const startPostTest = (user) => { currentTestType.value='Post-test'; currentUserId.value=user.userId; form.name=user.name; startQuiz(); };
+        const goToSatisfaction = () => { satForm.name=''; satForm.scores=Array(20).fill(0); satForm.suggestion=''; currentPage.value='satisfaction'; };
+
+        /* ── Quiz ── */
+        const startQuiz = () => { currentQuestionIndex.value=0; answers.value=new Array(questions.length); currentPage.value='quiz'; };
+        const selectAnswer = idx => { answers.value[currentQuestionIndex.value]=idx; };
+        const nextQuestion = () => { if(answers.value[currentQuestionIndex.value]===undefined) return; currentQuestionIndex.value++; };
+
+        const submitQuiz = () => {
+            let score=0;
+            const results = answers.value.map((ans,idx)=>{ const ok=ans===questions[idx].correct; if(ok) score++; return ok?1:0; });
+
+            /* Score popup */
+            const pct2 = Math.round(score/questions.length*100);
+            const col   = pct2>=80?'#16a34a':pct2>=60?'#d97706':'#dc2626';
+            const bg    = pct2>=80?'#f0fdf4':pct2>=60?'#fffbeb':'#fff1f2';
+            const msg   = pct2>=80?'🎉 ยอดเยี่ยม!':pct2>=60?'👍 ผ่านเกณฑ์':'📚 ควรทบทวนเพิ่มเติม';
+
+            const items = questions.map((q,i)=>{
+                const ok=results[i]===1;
+                return `<div style="display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .6rem;border-radius:.5rem;margin-bottom:.3rem;background:${ok?'#f0fdf4':'#fff1f2'};border:1px solid ${ok?'#bbf7d0':'#fecdd3'}">
+                    <span style="font-size:1rem;flex-shrink:0">${ok?'✅':'❌'}</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:.78rem;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                            ข้อ ${i+1}: ${q.q.substring(q.q.indexOf('.')+2)}
+                        </div>
+                        ${!ok?`<div style="font-size:.72rem;color:#ef4444;margin-top:1px">เลือก: ${q.options[answers.value[i]]}</div>
+                               <div style="font-size:.72rem;color:#16a34a">เฉลย: ${q.options[q.correct]}</div>`:''}
+                    </div>
+                </div>`;
+            }).join('');
+
+            const html = `
+<div style="text-align:center;margin-bottom:1rem">
+    <div style="display:inline-block;background:${bg};border-radius:1rem;padding:.875rem 2.5rem;border:2px solid ${col}">
+        <div style="font-size:2.8rem;font-weight:900;color:${col};line-height:1">${score}</div>
+        <div style="font-size:.85rem;color:#6b7280;font-weight:500">/ ${questions.length} คะแนน (${pct2}%)</div>
+    </div>
+    <div style="margin-top:.5rem;font-size:.9rem;color:${col};font-weight:700">${msg}</div>
+</div>
+<div style="max-height:300px;overflow-y:auto;padding-right:2px">${items}</div>`;
+
+            const payload = { ...form, userId:currentUserId.value, testType:currentTestType.value, score, answers:answers.value, results };
+            Swal.fire({ title:'กำลังบันทึก...', allowOutsideClick:false, didOpen:()=>Swal.showLoading() });
+
+            runGas('saveQuizData',{payload})
+                .then(()=>{
+                    const wasPost = currentTestType.value==='Post-test';
+                    Swal.fire({
+                        title:`ผลการทำแบบทดสอบ ${currentTestType.value}`,
+                        html, width:560,
+                        confirmButtonText:'รับทราบ', confirmButtonColor:col
+                    }).then(()=>{
+                        loadDashboard();
+                        if(wasPost){
+                            setTimeout(()=>{
+                                Swal.fire({
+                                    title:'ขอความร่วมมือ', text:'กรุณาทำแบบประเมินความพึงพอใจต่อ', icon:'question',
+                                    showCancelButton:true, confirmButtonText:'ทำแบบประเมิน',
+                                    cancelButtonText:'กลับหน้าหลัก', confirmButtonColor:'#7c3aed'
+                                }).then(r=>{ if(r.isConfirmed) goToSatisfaction(); });
+                            },300);
+                        }
+                    });
+                })
+                .catch(()=>Swal.fire('ผิดพลาด','ไม่สามารถบันทึกข้อมูลได้','error'));
+        };
+
+        /* ── Satisfaction ── */
+        const submitSatisfaction = () => {
+            if(satForm.scores.some(s=>s===0)){ Swal.fire('แจ้งเตือน','กรุณาประเมินให้ครบทุกข้อ','warning'); return; }
+            Swal.fire({ title:'กำลังบันทึก...', didOpen:()=>Swal.showLoading() });
+            runGas('saveSatisfaction',{payload:JSON.parse(JSON.stringify(satForm))})
+                .then(()=>Swal.fire('ขอบคุณครับ','บันทึกข้อมูลเรียบร้อย','success').then(()=>loadDashboard()))
+                .catch(()=>Swal.fire('ผิดพลาด','ไม่สามารถบันทึกได้','error'));
+        };
+
+        /* ── Admin ── */
+        const adminLogin = () => {
+            if(adminUser.value==='admin'&&adminPass.value==='1234'){ showAdminLogin.value=false; loadDashboard(); }
+            else Swal.fire('Error','Username หรือ Password ผิด','error');
+        };
+
+        /* ── Dashboard ── */
+        const loadDashboard = () => {
+            currentPage.value='dashboard';
+            Swal.fire({ title:'Loading...', allowOutsideClick:false, didOpen:()=>Swal.showLoading() });
+            runGas('getDashboardData').then(d=>processDashboardData(d)).catch(()=>Swal.close());
+        };
+
+        const processDashboardData = (data) => {
+            Swal.close();
+            const quizRaw = data.quizData||[];
+            const satRaw  = data.satData ||[];
+            cachedQuizData.value = quizRaw;
+
+            /* Build user map
+             * col: 0=Timestamp,1=UserID,2=Name,3=Sex,4=Age,5=Unit,6=Position,
+             *      7=HouseNo,8=Moo,9=Tambon,10=Amphure,11=Province,12=FullAddress,
+             *      13=TestType,14=TotalScore,
+             *      15-24=A1..A10, 25-34=C1..C10 */
+            const users = {};
+            quizRaw.forEach(row=>{
+                const id    = String(row[1]);
+                const type  = String(row[13]||'');
+                const score = Number(row[14]);
+                const res   = row.slice(25,35).map(v=>{ const n=Number(v); return isNaN(n)?0:n; });
+
+                if(!users[id]) users[id]={ id, name:String(row[2]||''), sex:String(row[3]||''), age:Number(row[4]||0), unit:String(row[5]||''), address:String(row[12]||''), pre:null, post:null, preRes:[], postRes:[] };
+                if(type==='Pre-test')  { users[id].pre=score;  users[id].preRes=res;  }
+                if(type==='Post-test') { users[id].post=score; users[id].postRes=res; }
+            });
+
+            const ua = Object.values(users);
+            stats.userList   = ua;
+            stats.totalUsers = ua.length;
+
+            const preArr  = ua.filter(u=>u.pre !==null).map(u=>u.pre);
+            const postArr = ua.filter(u=>u.post!==null).map(u=>u.post);
+            stats.totalPre  = preArr.length;
+            stats.totalPost = postArr.length;
+            stats.avgPre    = mean(preArr);
+            stats.avgPost   = mean(postArr);
+
+            /* ── Item Analysis ── */
+            const wrongPre   = Array(10).fill(0);
+            const wrongPost  = Array(10).fill(0);
+            const correctPre  = Array(10).fill(0);
+            const correctPost = Array(10).fill(0);
+            let nPre=0, nPost=0;
+
+            ua.forEach(u=>{
+                if(u.pre!==null && u.preRes.length===10){
+                    nPre++;
+                    u.preRes.forEach((r,i)=>{ if(Number(r)===1) correctPre[i]++; else wrongPre[i]++; });
+                }
+                if(u.post!==null && u.postRes.length===10){
+                    nPost++;
+                    u.postRes.forEach((r,i)=>{ if(Number(r)===1) correctPost[i]++; else wrongPost[i]++; });
+                }
+            });
+
+            stats.itemAnalysis.preWrong    = wrongPre;
+            stats.itemAnalysis.postWrong   = wrongPost;
+            stats.itemAnalysis.preCorrect  = correctPre;
+            stats.itemAnalysis.postCorrect = correctPost;
+            stats.itemAnalysis.improvement = wrongPre.map((pw,i)=>{
+                const pPre  = nPre  > 0 ? (pw          /nPre) *100 : 0;
+                const pPost = nPost > 0 ? (wrongPost[i]/nPost)*100 : 0;
+                return (pPre-pPost).toFixed(1);
+            });
+
+            /* Paired t */
+            const paired = ua.filter(u=>u.pre!==null&&u.post!==null);
+            if(paired.length>1) stats.tTest = pairedT(paired.map(u=>u.pre),paired.map(u=>u.post));
+
+            /* Welch t */
+            const mPost=ua.filter(u=>u.sex==='ชาย' &&u.post!==null).map(u=>u.post);
+            const fPost=ua.filter(u=>u.sex==='หญิง'&&u.post!==null).map(u=>u.post);
+            stats.sexTest.maleN=mPost.length; stats.sexTest.femaleN=fPost.length;
+            stats.sexTest.maleMean=mean(mPost); stats.sexTest.femaleMean=mean(fPost);
+            stats.sexTest.maleSD=sd(mPost); stats.sexTest.femaleSD=sd(fPost);
+            if(mPost.length>1&&fPost.length>1){ const wt=welchT(mPost,fPost); stats.sexTest.t=wt.t; stats.sexTest.p=wt.p; }
+
+            /* ANOVA */
+            const ag={};
+            ua.filter(u=>u.post!==null).forEach(u=>{ const g=u.age<30?'20-29':u.age<40?'30-39':u.age<50?'40-49':'50+'; if(!ag[g]) ag[g]=[]; ag[g].push(u.post); });
+            stats.anova.groups={};
+            for(const g in ag) stats.anova.groups[g]={ n:ag[g].length, mean:mean(ag[g]) };
+
+            /* Satisfaction */
+            const iSums=Array(20).fill(0);
+            satRaw.forEach(row=>{ for(let i=0;i<20;i++) iSums[i]+=parseFloat(row[i+3]||0); });
+            const satN=satRaw.length;
+            stats.satItemScores=iSums.map(s=>satN>0?(s/satN).toFixed(2):'0.00');
+            stats.avgSat = satN>0 ? (iSums.reduce((a,b)=>a+b,0)/(satN*20))/5*100 : 0;
+            stats.suggestions=satRaw.map(r=>r[23]).filter(Boolean);
+
+            renderCharts(ua);
+        };
+
+        /* ── Charts ── */
+        const renderCharts = (ua) => {
+            const destroy = id => { const c=document.getElementById(id); if(Chart.getChart(c)) Chart.getChart(c).destroy(); return c; };
+
+/* Satisfaction */
+new Chart(destroy('chartSat'),{
+    type:'bar',
+    data:{ labels:satisfactionQuestions.map((_,i)=>`ข้อ ${i+1}`), datasets:[{
+        data:stats.satItemScores,
+        backgroundColor:stats.satItemScores.map(v=>{
+            const n=parseFloat(v);
+            return n>=4.5?'rgba(22,163,74,.85)'    // เขียวเข้ม  ≥ 4.5
+                 : n>=3.5?'rgba(34,197,94,.75)'    // เขียวกลาง ≥ 3.5
+                 :        'rgba(134,239,172,.8)';  // เขียวอ่อน  < 3.5
+        }),
+        borderRadius:5, borderSkipped:false
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false},
+            datalabels:{ anchor:'end',align:'top',color:'#15803d',font:{weight:'bold',size:9},formatter:v=>parseFloat(v).toFixed(2) },
+            tooltip:{callbacks:{title:ctx=>`${ctx[0].dataIndex+1}. ${satisfactionQuestions[ctx[0].dataIndex]}`}}
+        },
+        scales:{ y:{beginAtZero:true,max:5,grid:{color:'rgba(0,0,0,.04)'},ticks:{stepSize:1,font:{size:10}}}, x:{grid:{display:false},ticks:{font:{size:9}}} }
+    }
+});
+
+            /* Pre/Post */
+            new Chart(destroy('chartPrePost'),{
+                type:'bar',
+                data:{ labels:['Pre-test','Post-test'], datasets:[{ data:[stats.avgPre,stats.avgPost], backgroundColor:['rgba(239,68,68,.8)','rgba(34,197,94,.8)'], borderRadius:8, borderSkipped:false }]},
+                options:{ responsive:true, maintainAspectRatio:false,
+                    plugins:{ legend:{display:false},
+                        datalabels:{ anchor:'end',align:'top',font:{weight:'bold'},color:['#ef4444','#16a34a'],formatter:v=>v.toFixed(2) }
+                    },
+                    scales:{ y:{beginAtZero:true,max:10,grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false}} }
+                }
+            });
+
+            /* Sex */
+            const m=ua.filter(u=>u.sex==='ชาย').length, f=ua.filter(u=>u.sex==='หญิง').length, tot=m+f;
+            new Chart(destroy('chartSex'),{
+                type:'pie',
+                data:{ labels:['ชาย','หญิง'], datasets:[{ data:[m,f], backgroundColor:['#3b82f6','#ec4899'], borderWidth:2, borderColor:'#fff' }]},
+                options:{ responsive:true, maintainAspectRatio:false,
+                    plugins:{ datalabels:{ color:'#fff',font:{weight:'bold',size:11}, formatter:v=>tot>0&&v>0?`${v}\n(${(v/tot*100).toFixed(1)}%)`:''}}}
+            });
+
+            /* Age */
+            const ag={'20-29':0,'30-39':0,'40-49':0,'50+':0};
+            ua.forEach(u=>{ if(u.age<30)ag['20-29']++; else if(u.age<40)ag['30-39']++; else if(u.age<50)ag['40-49']++; else ag['50+']++; });
+            new Chart(destroy('chartAge'),{
+                type:'doughnut',
+                data:{ labels:Object.keys(ag), datasets:[{ data:Object.values(ag), backgroundColor:['#fde047','#fb923c','#f97316','#dc2626'], borderWidth:2, borderColor:'#fff' }]},
+                options:{ responsive:true, maintainAspectRatio:false,
+                    plugins:{ datalabels:{ color:'#1f2937',font:{weight:'bold',size:10}, formatter:(v,ctx)=>{ const s=ctx.dataset.data.reduce((a,b)=>a+b,0); return v>0&&s>0?`${(v/s*100).toFixed(0)}%`:''; }}}}
+            });
+        };
+
+        /* ── AI Report ── */
+        const generateAIReport = async () => {
+            const top = stats.itemAnalysis.preWrong.length>0 ? stats.itemAnalysis.preWrong.indexOf(Math.max(...stats.itemAnalysis.preWrong))+1 : 'N/A';
+            const prompt=`สรุปผลการอบรม "AI in Public Health" สำหรับผู้บริหาร:\n- ผู้เข้าอบรม: ${stats.totalUsers} คน\n- Pre-test เฉลี่ย: ${stats.avgPre.toFixed(2)}/10\n- Post-test เฉลี่ย: ${stats.avgPost.toFixed(2)}/10\n- ความพึงพอใจ: ${stats.avgSat.toFixed(1)}%\n- ข้อที่ผิดมากที่สุด (Pre): ข้อ ${top}\n- ข้อเสนอแนะ: ${stats.suggestions.slice(0,3).join(', ')||'ไม่มี'}\nเขียนสรุป 3-4 ย่อหน้า ภาษาไทย โทนผู้บริหาร`;
+            aiReport.value='⏳ กำลังประมวลผลด้วย AI...';
+            let ok=false;
+            for(const m of GEMINI_MODELS){ if(ok) break;
+                for(const k of API_KEYS){ if(ok) break;
+                    try{
+                        const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m.endpoint}:generateContent?key=${k}`,
+                            {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+                        if(r.ok){ const d=await r.json(); if(d.candidates?.[0]?.content?.parts?.[0]?.text){ aiReport.value=d.candidates[0].content.parts[0].text+`\n\n— ${m.id}`; ok=true; } }
+                    }catch(e){}
+                }
+            }
+            if(!ok) aiReport.value='⚠️ ไม่สามารถเชื่อมต่อ AI ได้ กรุณาลองใหม่';
+        };
+
+        /* ── Export ── */
+        const exportToExcel = () => {
+            const wb=XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(satisfactionQuestions.map((q,i)=>({'ข้อที่':i+1,'หัวข้อ':q,'คะแนนเฉลี่ย':stats.satItemScores[i]||0}))), 'Satisfaction');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stats.userList.map(u=>({Name:u.name,Sex:u.sex,Age:u.age,Unit:u.unit,Pre:u.pre,Post:u.post}))), 'Participants');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(questions.map((q,i)=>({
+                'ข้อที่':i+1,'คำถาม':q.q,
+                'Pre ถูก':stats.itemAnalysis.preCorrect[i],'Pre ผิด':stats.itemAnalysis.preWrong[i],
+                'Post ถูก':stats.itemAnalysis.postCorrect[i],'Post ผิด':stats.itemAnalysis.postWrong[i],
+                'พัฒนาการ(%)':stats.itemAnalysis.improvement[i]
+            }))), 'ItemAnalysis');
+            XLSX.writeFile(wb,'AI_PublicHealth_Report.xlsx');
+        };
+
+        onMounted(()=>loadDashboard());
+
+        return {
+            currentPage, showAdminLogin, adminUser, adminPass, adminLogin,
+            form, satForm, satisfactionQuestions,
+            startPreTest, submitRegistration,
+            goToPostTestSearch, performSearch, searchResults, isSearching, hasSearched, startPostTest,
+            questions, currentQuestionIndex, answers, answeredCount, selectAnswer, nextQuestion, submitQuiz, currentTestType,
+            goToSatisfaction, submitSatisfaction,
+            stats, satAvgDisplay, avgImprovement, aiReport, generateAIReport,
+            loadDashboard, exportToExcel,
+            userSearch, filteredUserList,
+            pct, sumArr,
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
