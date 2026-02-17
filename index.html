@@ -126,22 +126,50 @@
 <div id="app" class="min-h-screen flex flex-col">
 
     <!-- NAVBAR -->
-    <nav class="navbar text-white sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="navbar-logo"><i class="fa-solid fa-heart-pulse text-2xl text-white"></i></div>
-                <div>
-                    <div class="navbar-brand-main"> โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน 1/2569</div>
-                    <div class="navbar-brand-main">AI in Public Health “ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข”</div>
-                    <div class="navbar-brand-main">นายจรัญญู ทองเอนก</div>
+<nav class="navbar text-white sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div class="navbar-logo flex-shrink-0">
+                <i class="fa-solid fa-heart-pulse text-lg sm:text-2xl text-white"></i>
+            </div>
+            <div>
+                <!-- บรรทัดที่ 1: ชื่อโครงการ -->
+                <div class="text-teal-100 font-medium leading-tight"
+                    style="font-size:clamp(.6rem,.9vw + .3rem,.78rem)">
+                    <i class="fa-solid fa-star-of-life text-xs mr-1 opacity-60"></i>
+                    โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน 1/2569
+                </div>
+                <!-- บรรทัดที่ 2: ชื่อหลักสูตร -->
+                <div class="font-extrabold text-white leading-tight tracking-wide"
+                    style="font-size:clamp(.85rem,1.5vw + .4rem,1.45rem); text-shadow:0 2px 8px rgba(0,0,0,.25)">
+                    AI in Public Health
+                    <span class="hidden sm:inline font-medium text-teal-100"
+                        style="font-size:clamp(.7rem,1vw + .2rem,1rem)">
+                        "ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข"
+                    </span>
+                </div>
+                <!-- มือถือ: ชื่อหลักสูตรย่อ แยกบรรทัด -->
+                <div class="sm:hidden text-teal-100 font-medium leading-tight"
+                    style="font-size:clamp(.6rem,.8vw + .3rem,.72rem)">
+                    "ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข"
+                </div>
+                <!-- บรรทัดที่ 3: ชื่อผู้พัฒนา -->
+                <div class="text-teal-200 leading-tight"
+                    style="font-size:clamp(.55rem,.7vw + .2rem,.72rem); opacity:.85">
+                    <i class="fa-solid fa-user text-xs mr-1 opacity-70"></i>
+                    นายจรัญญู ทองเอนก
                 </div>
             </div>
-            <button v-if="currentPage !== 'dashboard'" @click="loadDashboard"
-                class="text-sm bg-white/15 hover:bg-white/25 border border-white/25 px-4 py-2 rounded-xl transition flex items-center gap-2 font-semibold">
-                <i class="fa-solid fa-house text-xs"></i><span class="hidden sm:inline">หน้าหลัก</span>
-            </button>
         </div>
-    </nav>
+
+        <!-- ปุ่มกลับหน้าหลัก -->
+        <button v-if="currentPage !== 'dashboard'" @click="loadDashboard"
+            class="flex-shrink-0 text-xs sm:text-sm bg-white/15 hover:bg-white/25 border border-white/25 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-semibold ml-2">
+            <i class="fa-solid fa-house text-xs"></i>
+            <span class="hidden sm:inline">หน้าหลัก</span>
+        </button>
+    </div>
+</nav>
 
     <main class="flex-grow container mx-auto px-4 py-8">
 
