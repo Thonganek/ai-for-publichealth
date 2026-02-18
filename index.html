@@ -19,8 +19,6 @@
         body { font-family:'Sarabun',sans-serif; background:#f0fafb; min-height:100vh; }
 
         .navbar { background:linear-gradient(135deg,#064e3b 0%,#065f46 40%,#0f766e 100%); box-shadow:0 4px 24px rgba(6,78,59,.35); }
-        .navbar-brand-main { font-size:1.45rem; font-weight:800; letter-spacing:.02em; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.25); }
-        .navbar-brand-sub  { font-size:.78rem; color:#a7f3d0; font-weight:500; letter-spacing:.04em; }
         .navbar-logo { background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.35); border-radius:12px; padding:8px 10px; }
 
         .glass-panel { background:rgba(255,255,255,.98); border-radius:1.25rem; box-shadow:0 8px 40px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04); border:1px solid rgba(226,232,240,.8); }
@@ -80,7 +78,6 @@
         .data-tbl tbody tr:hover { background:#f8fafc; }
         .data-tbl tbody tr:last-child td { border-bottom:none; }
 
-        /* Item Analysis special table */
         .item-tbl { width:100%; border-collapse:collapse; font-size:.85rem; }
         .item-tbl th, .item-tbl td { padding:.55rem .6rem; border:1px solid #e2e8f0; text-align:center; }
         .item-tbl thead tr:first-child th { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
@@ -126,50 +123,38 @@
 <div id="app" class="min-h-screen flex flex-col">
 
     <!-- NAVBAR -->
-<nav class="navbar text-white sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-2 flex justify-between items-center">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <div class="navbar-logo flex-shrink-0">
-                <i class="fa-solid fa-heart-pulse text-lg sm:text-2xl text-white"></i>
-            </div>
-            <div>
-                <!-- บรรทัดที่ 1: ชื่อโครงการ -->
-                <div class="text-teal-100 font-medium leading-tight"
-                    style="font-size:clamp(.6rem,.9vw + .3rem,.78rem)">
-                    <i class="fa-solid fa-star-of-life text-xs mr-1 opacity-60"></i>
-                    โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน 1/2569
+    <nav class="navbar text-white sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="navbar-logo flex-shrink-0">
+                    <i class="fa-solid fa-heart-pulse text-lg sm:text-2xl text-white"></i>
                 </div>
-                <!-- บรรทัดที่ 2: ชื่อหลักสูตร -->
-                <div class="font-extrabold text-white leading-tight tracking-wide"
-                    style="font-size:clamp(.85rem,1.5vw + .4rem,1.45rem); text-shadow:0 2px 8px rgba(0,0,0,.25)">
-                    AI in Public Health
-                    <span class="hidden sm:inline font-medium text-teal-100"
-                        style="font-size:clamp(.7rem,1vw + .2rem,1rem)">
+                <div>
+                    <div class="text-teal-100 font-medium leading-tight" style="font-size:clamp(.6rem,.9vw + .3rem,.78rem)">
+                        <i class="fa-solid fa-star-of-life text-xs mr-1 opacity-60"></i>
+                        โครงการเพิ่มพูนความรู้ วิชาชีพการสาธารณสุขชุมชน 1/2569
+                    </div>
+                    <div class="font-extrabold text-white leading-tight tracking-wide" style="font-size:clamp(.85rem,1.5vw + .4rem,1.45rem); text-shadow:0 2px 8px rgba(0,0,0,.25)">
+                        AI in Public Health
+                        <span class="hidden sm:inline font-medium text-teal-100" style="font-size:clamp(.7rem,1vw + .2rem,1rem)">
+                            "ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข"
+                        </span>
+                    </div>
+                    <div class="sm:hidden text-teal-100 font-medium leading-tight" style="font-size:clamp(.6rem,.8vw + .3rem,.72rem)">
                         "ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข"
-                    </span>
-                </div>
-                <!-- มือถือ: ชื่อหลักสูตรย่อ แยกบรรทัด -->
-                <div class="sm:hidden text-teal-100 font-medium leading-tight"
-                    style="font-size:clamp(.6rem,.8vw + .3rem,.72rem)">
-                    "ปัญญาประดิษฐ์กับการปฏิบัติงานของนักสาธารณสุข"
-                </div>
-                <!-- บรรทัดที่ 3: ชื่อผู้พัฒนา -->
-                <div class="text-teal-200 leading-tight"
-                    style="font-size:clamp(.55rem,.7vw + .2rem,.72rem); opacity:.85">
-                    <i class="fa-solid fa-user text-xs mr-1 opacity-70"></i>
-                    นายจรัญญู ทองเอนก
+                    </div>
+                    <div class="text-teal-200 leading-tight" style="font-size:clamp(.55rem,.7vw + .2rem,.72rem); opacity:.85">
+                        <i class="fa-solid fa-user text-xs mr-1 opacity-70"></i>
+                        นายจรัญญู ทองเอนก
+                    </div>
                 </div>
             </div>
+            <button v-if="currentPage !== 'dashboard'" @click="loadDashboard" class="flex-shrink-0 text-xs sm:text-sm bg-white/15 hover:bg-white/25 border border-white/25 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-semibold ml-2">
+                <i class="fa-solid fa-house text-xs"></i>
+                <span class="hidden sm:inline">หน้าหลัก</span>
+            </button>
         </div>
-
-        <!-- ปุ่มกลับหน้าหลัก -->
-        <button v-if="currentPage !== 'dashboard'" @click="loadDashboard"
-            class="flex-shrink-0 text-xs sm:text-sm bg-white/15 hover:bg-white/25 border border-white/25 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition flex items-center gap-1.5 font-semibold ml-2">
-            <i class="fa-solid fa-house text-xs"></i>
-            <span class="hidden sm:inline">หน้าหลัก</span>
-        </button>
-    </div>
-</nav>
+    </nav>
 
     <main class="flex-grow container mx-auto px-4 py-8">
 
@@ -233,8 +218,7 @@
                     <button @click="exportToExcel" class="text-sm bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2">
                         <i class="fa-solid fa-file-excel"></i> Export
                     </button>
-                    <button @click="generateAIReport" class="text-sm font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2 text-white"
-                        style="background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea)">
+                    <button @click="generateAIReport" class="text-sm font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2 text-white" style="background:linear-gradient(135deg,#4f46e5,#7c3aed,#9333ea)">
                         <i class="fa-solid fa-robot"></i> AI Summary
                     </button>
                 </div>
@@ -376,7 +360,7 @@
                 </div>
             </div>
 
-            <!-- ══ Item Analysis ══ -->
+            <!-- Item Analysis -->
             <div class="dash-card mb-6">
                 <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h4 class="sec-hd red mb-0">วิเคราะห์รายข้อ (Item Analysis)</h4>
@@ -388,7 +372,6 @@
                 <div class="overflow-x-auto cscroll">
                     <table class="item-tbl">
                         <thead>
-                            <!-- Row 1: group headers -->
                             <tr>
                                 <th rowspan="2" style="background:#f8fafc;min-width:2rem">ข้อ</th>
                                 <th rowspan="2" style="background:#f8fafc;text-align:left;min-width:180px">คำถาม</th>
@@ -402,7 +385,6 @@
                                     พัฒนาการ<br><span style="font-size:.65rem;font-weight:400">(% ผิดลดลง)</span>
                                 </th>
                             </tr>
-                            <!-- Row 2: sub-headers -->
                             <tr>
                                 <th style="background:#f0fdf4;color:#15803d;min-width:70px">
                                     <i class="fa-solid fa-check text-green-500 mr-1"></i>ถูก
@@ -420,105 +402,54 @@
                         </thead>
                         <tbody>
                             <tr v-for="(q,idx) in questions" :key="idx">
-                                <!-- ข้อที่ -->
                                 <td style="background:#f8fafc;font-weight:700;color:#94a3b8;font-size:.8rem">{{ idx+1 }}</td>
-                                <!-- คำถาม -->
                                 <td class="cell-q" style="background:#f8fafc" :title="q.q">{{ q.q }}</td>
-
-                                <!-- Pre ถูก -->
                                 <td style="background:#f0fdf4">
-                                    <span class="font-bold text-green-700">
-                                        {{ stats.totalPre > 0 ? stats.itemAnalysis.preCorrect[idx] : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-500">
-                                        {{ pct(stats.itemAnalysis.preCorrect[idx], stats.totalPre) }}%
-                                    </span>
+                                    <span class="font-bold text-green-700">{{ stats.totalPre > 0 ? stats.itemAnalysis.preCorrect[idx] : '—' }}</span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-500">{{ pct(stats.itemAnalysis.preCorrect[idx], stats.totalPre) }}%</span>
                                 </td>
-                                <!-- Pre ผิด -->
                                 <td style="background:#fff1f2">
-                                    <span class="font-bold text-red-600">
-                                        {{ stats.totalPre > 0 ? stats.itemAnalysis.preWrong[idx] : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-400">
-                                        {{ pct(stats.itemAnalysis.preWrong[idx], stats.totalPre) }}%
-                                    </span>
+                                    <span class="font-bold text-red-600">{{ stats.totalPre > 0 ? stats.itemAnalysis.preWrong[idx] : '—' }}</span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-400">{{ pct(stats.itemAnalysis.preWrong[idx], stats.totalPre) }}%</span>
                                 </td>
-                                <!-- Post ถูก -->
                                 <td style="background:#eff6ff">
-                                    <span class="font-bold text-blue-700">
-                                        {{ stats.totalPost > 0 ? stats.itemAnalysis.postCorrect[idx] : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-500">
-                                        {{ pct(stats.itemAnalysis.postCorrect[idx], stats.totalPost) }}%
-                                    </span>
+                                    <span class="font-bold text-blue-700">{{ stats.totalPost > 0 ? stats.itemAnalysis.postCorrect[idx] : '—' }}</span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-500">{{ pct(stats.itemAnalysis.postCorrect[idx], stats.totalPost) }}%</span>
                                 </td>
-                                <!-- Post ผิด -->
                                 <td style="background:#faf5ff">
-                                    <span class="font-bold text-purple-700">
-                                        {{ stats.totalPost > 0 ? stats.itemAnalysis.postWrong[idx] : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-400">
-                                        {{ pct(stats.itemAnalysis.postWrong[idx], stats.totalPost) }}%
-                                    </span>
+                                    <span class="font-bold text-purple-700">{{ stats.totalPost > 0 ? stats.itemAnalysis.postWrong[idx] : '—' }}</span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-400">{{ pct(stats.itemAnalysis.postWrong[idx], stats.totalPost) }}%</span>
                                 </td>
-                                <!-- พัฒนาการ -->
                                 <td style="background:#f0fdf4">
                                     <span v-if="stats.totalPre > 0 || stats.totalPost > 0" class="imp-chip"
-                                        :class="parseFloat(stats.itemAnalysis.improvement[idx]) > 0
-                                            ? 'bg-green-100 text-green-700'
-                                            : parseFloat(stats.itemAnalysis.improvement[idx]) < 0
-                                                ? 'bg-red-100 text-red-600'
-                                                : 'bg-gray-100 text-gray-500'">
+                                        :class="parseFloat(stats.itemAnalysis.improvement[idx]) > 0 ? 'bg-green-100 text-green-700' : parseFloat(stats.itemAnalysis.improvement[idx]) < 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-500'">
                                         {{ parseFloat(stats.itemAnalysis.improvement[idx]) >= 0 ? '+' : '' }}{{ stats.itemAnalysis.improvement[idx] }}%
                                     </span>
                                     <span v-else class="text-gray-300 text-xs">—</span>
                                 </td>
                             </tr>
                         </tbody>
-
-                        <!-- Footer รวมเฉลี่ย -->
                         <tfoot v-if="stats.totalPre > 0 || stats.totalPost > 0">
                             <tr>
                                 <td colspan="2" style="background:#f1f5f9;text-align:right;color:#475569;font-size:.78rem;padding:.55rem .875rem">
                                     <i class="fa-solid fa-sigma mr-1"></i>รวมเฉลี่ย / ข้อ
                                 </td>
-                                <!-- Pre ถูก avg -->
                                 <td style="background:#dcfce7">
-                                    <span class="font-bold text-green-800">
-                                        {{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preCorrect)/10).toFixed(1) : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-600">
-                                        {{ pct(sumArr(stats.itemAnalysis.preCorrect)/10, stats.totalPre) }}%
-                                    </span>
+                                    <span class="font-bold text-green-800">{{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preCorrect)/10).toFixed(1) : '—' }}</span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-green-600">{{ pct(sumArr(stats.itemAnalysis.preCorrect)/10, stats.totalPre) }}%</span>
                                 </td>
-                                <!-- Pre ผิด avg -->
                                 <td style="background:#fecaca">
-                                    <span class="font-bold text-red-800">
-                                        {{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preWrong)/10).toFixed(1) : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-600">
-                                        {{ pct(sumArr(stats.itemAnalysis.preWrong)/10, stats.totalPre) }}%
-                                    </span>
+                                    <span class="font-bold text-red-800">{{ stats.totalPre > 0 ? (sumArr(stats.itemAnalysis.preWrong)/10).toFixed(1) : '—' }}</span>
+                                    <span v-if="stats.totalPre > 0" class="cell-num text-red-600">{{ pct(sumArr(stats.itemAnalysis.preWrong)/10, stats.totalPre) }}%</span>
                                 </td>
-                                <!-- Post ถูก avg -->
                                 <td style="background:#bfdbfe">
-                                    <span class="font-bold text-blue-800">
-                                        {{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postCorrect)/10).toFixed(1) : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-600">
-                                        {{ pct(sumArr(stats.itemAnalysis.postCorrect)/10, stats.totalPost) }}%
-                                    </span>
+                                    <span class="font-bold text-blue-800">{{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postCorrect)/10).toFixed(1) : '—' }}</span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-blue-600">{{ pct(sumArr(stats.itemAnalysis.postCorrect)/10, stats.totalPost) }}%</span>
                                 </td>
-                                <!-- Post ผิด avg -->
                                 <td style="background:#e9d5ff">
-                                    <span class="font-bold text-purple-800">
-                                        {{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postWrong)/10).toFixed(1) : '—' }}
-                                    </span>
-                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-600">
-                                        {{ pct(sumArr(stats.itemAnalysis.postWrong)/10, stats.totalPost) }}%
-                                    </span>
+                                    <span class="font-bold text-purple-800">{{ stats.totalPost > 0 ? (sumArr(stats.itemAnalysis.postWrong)/10).toFixed(1) : '—' }}</span>
+                                    <span v-if="stats.totalPost > 0" class="cell-num text-purple-600">{{ pct(sumArr(stats.itemAnalysis.postWrong)/10, stats.totalPost) }}%</span>
                                 </td>
-                                <!-- พัฒนาการเฉลี่ย -->
                                 <td style="background:#bbf7d0">
                                     <span v-if="stats.totalPre > 0 && stats.totalPost > 0" class="imp-chip bg-green-200 text-green-800">
                                         {{ parseFloat(avgImprovement) >= 0 ? '+' : '' }}{{ avgImprovement }}%
@@ -532,7 +463,6 @@
 
             <!-- Bottom Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- User List -->
                 <div class="dash-card">
                     <h4 class="sec-hd gray">รายชื่อผู้เข้าอบรม</h4>
                     <div class="relative mb-3">
@@ -565,12 +495,10 @@
                         </table>
                     </div>
                 </div>
-                <!-- Suggestions -->
                 <div class="dash-card">
                     <h4 class="sec-hd purple">ข้อเสนอแนะจากผู้เข้าอบรม</h4>
                     <div class="max-h-72 overflow-y-auto cscroll space-y-2">
-                        <div v-for="(s,i) in stats.suggestions" :key="i"
-                            class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-3 text-sm text-gray-700 italic">
+                        <div v-for="(s,i) in stats.suggestions" :key="i" class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-3 text-sm text-gray-700 italic">
                             <i class="fa-solid fa-quote-left text-purple-200 mr-1 text-xs"></i>{{ s }}
                         </div>
                         <div v-if="stats.suggestions.length===0" class="text-center text-gray-400 py-8 text-sm">
@@ -580,8 +508,7 @@
                 </div>
             </div>
         </div>
-
-        <!-- ══════════════ REGISTER ══════════════ -->
+        <!-- ══════════════ REGISTER (✅ เพิ่ม PREFIX + IDCARD) ══════════════ -->
         <div v-if="currentPage==='register'" class="max-w-4xl mx-auto glass-panel p-8 page-in">
             <div class="flex items-center gap-4 mb-7 pb-5 border-b border-gray-100">
                 <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-xl">
@@ -594,10 +521,41 @@
             </div>
             <form @submit.prevent="submitRegistration" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
+                    <!-- ✅ คำนำหน้า -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">คำนำหน้า <span class="text-red-500">*</span></label>
+                        <select v-model="form.prefix" required class="input-field">
+                            <option value="">เลือกคำนำหน้า</option>
+                            <option>นาย</option>
+                            <option>นาง</option>
+                            <option>นางสาว</option>
+                            <option>เด็กชาย</option>
+                            <option>เด็กหญิง</option>
+                        </select>
+                    </div>
+
+                    <!-- ชื่อ-สกุล -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ-สกุล <span class="text-red-500">*</span></label>
-                        <input v-model="form.name" required class="input-field" placeholder="ระบุคำนำหน้าและชื่อ-สกุล">
+                        <input v-model="form.name" required class="input-field" placeholder="ระบุชื่อและนามสกุล (ไม่ต้องใส่คำนำหน้า)">
                     </div>
+
+                    <!-- ✅ เลขบัตรประชาชน -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            เลขบัตรประชาชน <span class="text-red-500">*</span>
+                            <span class="text-xs text-gray-400 font-normal ml-1">(13 หลัก เพื่อใช้เก็บหน่วยกิจ)</span>
+                        </label>
+                        <input v-model="form.idCard" 
+                               required 
+                               class="input-field" 
+                               type="text"
+                               pattern="[0-9]{13}"
+                               maxlength="13"
+                               placeholder="กรอก 13 หลัก เช่น 1234567890123"
+                               @input="form.idCard = form.idCard.replace(/\D/g,'')">
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">เพศ <span class="text-red-500">*</span></label>
@@ -620,6 +578,8 @@
                         <input v-model="form.position" required class="input-field" placeholder="เช่น นักวิชาการสาธารณสุข">
                     </div>
                 </div>
+
+                <!-- ที่อยู่ -->
                 <div class="bg-gradient-to-br from-gray-50 to-teal-50/30 p-5 rounded-xl border border-gray-100">
                     <h3 class="font-bold text-teal-700 mb-4 flex items-center gap-2 text-sm">
                         <i class="fa-solid fa-map-location-dot"></i> ที่อยู่ปัจจุบัน
@@ -651,6 +611,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="md:col-span-2 pt-4 border-t border-gray-100 flex justify-center">
                     <button type="submit" class="btn-primary px-12 py-3" style="font-size:1.05rem">
                         เริ่มทำแบบทดสอบ <i class="fa-solid fa-arrow-right"></i>
@@ -805,7 +766,7 @@ const { createApp, ref, reactive, computed, onMounted } = Vue;
 Chart.register(ChartDataLabels);
 
 const API_KEYS = [
-    "AIzaSyCWLJT4VknnhsKz_M0pP-ruWpkjLpYls2w",
+    "AIzaSyAaKcJtq-mgSneNOaU1TwEvu7aOfuU-lc8",
     "AIzaSyAuGmhGGfVIgdcBS-bDPu06I_fQpIy2Sng",
     "AIzaSyAXn2RnKle5RdJsD74PHVQbQAcOkPffkb4",
 ];
@@ -862,7 +823,11 @@ createApp({
         const adminPass      = ref('');
         const userSearch     = ref('');
 
-        const form = reactive({ name:'',sex:'',age:'',unit:'',position:'',houseNo:'',moo:'',province:'',amphure:'',tambon:'' });
+        // ✅ เพิ่ม prefix, idCard
+        const form = reactive({
+            prefix:'', name:'', idCard:'', sex:'', age:'', unit:'', position:'',
+            houseNo:'', moo:'', province:'', amphure:'', tambon:''
+        });
         const satForm = reactive({ name:'',scores:Array(20).fill(0),suggestion:'' });
 
         const currentTestType      = ref('Pre-test');
@@ -910,7 +875,6 @@ createApp({
             return (s/stats.itemAnalysis.improvement.length).toFixed(1);
         });
 
-        /* helper: percent */
         const pct = (n, total) => total > 0 ? ((n/total)*100).toFixed(0) : '0';
 
         /* ── Questions ── */
@@ -944,14 +908,25 @@ createApp({
 
         /* ── Navigation ── */
         const startPreTest = () => { currentPage.value='register'; };
-        const submitRegistration = () => { currentTestType.value='Pre-test'; currentUserId.value=null; startQuiz(); };
+        
+        const submitRegistration = () => {
+            // ✅ Validation เลขบัตร 13 หลัก
+            if (!/^\d{13}$/.test(form.idCard)) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณากรอกเลขบัตรประชาชน 13 หลัก', 'error');
+                return;
+            }
+            currentTestType.value='Pre-test';
+            currentUserId.value=null;
+            startQuiz();
+        };
+
         const goToPostTestSearch = () => { currentPage.value='search'; searchQuery.value=''; searchResults.value=[]; hasSearched.value=false; };
 
         const performSearch = () => {
             isSearching.value=true; hasSearched.value=false;
             runGas('searchUser',{nameQuery:searchQuery.value})
                 .then(users=>{
-                    const postIds = new Set(cachedQuizData.value.filter(r=>r[13]==='Post-test').map(r=>String(r[1])));
+                    const postIds = new Set(cachedQuizData.value.filter(r=>r[15]==='Post-test').map(r=>String(r[1])));
                     searchResults.value = users.map(u=>({ ...u, hasPost: u.hasPost || postIds.has(String(u.userId)) }));
                     isSearching.value=false; hasSearched.value=true;
                 })
@@ -970,7 +945,6 @@ createApp({
             let score=0;
             const results = answers.value.map((ans,idx)=>{ const ok=ans===questions[idx].correct; if(ok) score++; return ok?1:0; });
 
-            /* Score popup */
             const pct2 = Math.round(score/questions.length*100);
             const col   = pct2>=80?'#16a34a':pct2>=60?'#d97706':'#dc2626';
             const bg    = pct2>=80?'#f0fdf4':pct2>=60?'#fffbeb':'#fff1f2';
@@ -1054,19 +1028,27 @@ createApp({
             const satRaw  = data.satData ||[];
             cachedQuizData.value = quizRaw;
 
-            /* Build user map
-             * col: 0=Timestamp,1=UserID,2=Name,3=Sex,4=Age,5=Unit,6=Position,
-             *      7=HouseNo,8=Moo,9=Tambon,10=Amphure,11=Province,12=FullAddress,
-             *      13=TestType,14=TotalScore,
-             *      15-24=A1..A10, 25-34=C1..C10 */
+            /* ✅ Column ปรับใหม่: 
+             * 0=Timestamp,1=UserID,2=Prefix,3=Name,4=IDCard,5=Sex,6=Age,7=Unit,8=Position,
+             * 9=HouseNo,10=Moo,11=Tambon,12=Amphure,13=Province,14=FullAddress,
+             * 15=TestType,16=TotalScore,
+             * 17-26=A1..A10, 27-36=C1..C10 */
             const users = {};
             quizRaw.forEach(row=>{
                 const id    = String(row[1]);
-                const type  = String(row[13]||'');
-                const score = Number(row[14]);
-                const res   = row.slice(25,35).map(v=>{ const n=Number(v); return isNaN(n)?0:n; });
+                const type  = String(row[15]||'');
+                const score = Number(row[16]);
+                const res   = row.slice(27,37).map(v=>{ const n=Number(v); return isNaN(n)?0:n; });
 
-                if(!users[id]) users[id]={ id, name:String(row[2]||''), sex:String(row[3]||''), age:Number(row[4]||0), unit:String(row[5]||''), address:String(row[12]||''), pre:null, post:null, preRes:[], postRes:[] };
+                if(!users[id]) users[id]={
+                    id, 
+                    name:String((row[2]||'')+' '+(row[3]||'')).trim(),
+                    sex:String(row[5]||''),
+                    age:Number(row[6]||0),
+                    unit:String(row[7]||''),
+                    address:String(row[14]||''),
+                    pre:null, post:null, preRes:[], postRes:[]
+                };
                 if(type==='Pre-test')  { users[id].pre=score;  users[id].preRes=res;  }
                 if(type==='Post-test') { users[id].post=score; users[id].postRes=res; }
             });
@@ -1082,11 +1064,9 @@ createApp({
             stats.avgPre    = mean(preArr);
             stats.avgPost   = mean(postArr);
 
-            /* ── Item Analysis ── */
-            const wrongPre   = Array(10).fill(0);
-            const wrongPost  = Array(10).fill(0);
-            const correctPre  = Array(10).fill(0);
-            const correctPost = Array(10).fill(0);
+            /* Item Analysis */
+            const wrongPre=Array(10).fill(0), wrongPost=Array(10).fill(0);
+            const correctPre=Array(10).fill(0), correctPost=Array(10).fill(0);
             let nPre=0, nPost=0;
 
             ua.forEach(u=>{
@@ -1110,11 +1090,10 @@ createApp({
                 return (pPre-pPost).toFixed(1);
             });
 
-            /* Paired t */
+            /* Paired t, Welch t, ANOVA */
             const paired = ua.filter(u=>u.pre!==null&&u.post!==null);
             if(paired.length>1) stats.tTest = pairedT(paired.map(u=>u.pre),paired.map(u=>u.post));
 
-            /* Welch t */
             const mPost=ua.filter(u=>u.sex==='ชาย' &&u.post!==null).map(u=>u.post);
             const fPost=ua.filter(u=>u.sex==='หญิง'&&u.post!==null).map(u=>u.post);
             stats.sexTest.maleN=mPost.length; stats.sexTest.femaleN=fPost.length;
@@ -1122,7 +1101,6 @@ createApp({
             stats.sexTest.maleSD=sd(mPost); stats.sexTest.femaleSD=sd(fPost);
             if(mPost.length>1&&fPost.length>1){ const wt=welchT(mPost,fPost); stats.sexTest.t=wt.t; stats.sexTest.p=wt.p; }
 
-            /* ANOVA */
             const ag={};
             ua.filter(u=>u.post!==null).forEach(u=>{ const g=u.age<30?'20-29':u.age<40?'30-39':u.age<50?'40-49':'50+'; if(!ag[g]) ag[g]=[]; ag[g].push(u.post); });
             stats.anova.groups={};
@@ -1143,29 +1121,25 @@ createApp({
         const renderCharts = (ua) => {
             const destroy = id => { const c=document.getElementById(id); if(Chart.getChart(c)) Chart.getChart(c).destroy(); return c; };
 
-/* Satisfaction */
-new Chart(destroy('chartSat'),{
-    type:'bar',
-    data:{ labels:satisfactionQuestions.map((_,i)=>`ข้อ ${i+1}`), datasets:[{
-        data:stats.satItemScores,
-        backgroundColor:stats.satItemScores.map(v=>{
-            const n=parseFloat(v);
-            return n>=4.5?'rgba(22,163,74,.85)'    // เขียวเข้ม  ≥ 4.5
-                 : n>=3.5?'rgba(34,197,94,.75)'    // เขียวกลาง ≥ 3.5
-                 :        'rgba(134,239,172,.8)';  // เขียวอ่อน  < 3.5
-        }),
-        borderRadius:5, borderSkipped:false
-    }]},
-    options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{display:false},
-            datalabels:{ anchor:'end',align:'top',color:'#15803d',font:{weight:'bold',size:9},formatter:v=>parseFloat(v).toFixed(2) },
-            tooltip:{callbacks:{title:ctx=>`${ctx[0].dataIndex+1}. ${satisfactionQuestions[ctx[0].dataIndex]}`}}
-        },
-        scales:{ y:{beginAtZero:true,max:5,grid:{color:'rgba(0,0,0,.04)'},ticks:{stepSize:1,font:{size:10}}}, x:{grid:{display:false},ticks:{font:{size:9}}} }
-    }
-});
+            new Chart(destroy('chartSat'),{
+                type:'bar',
+                data:{ labels:satisfactionQuestions.map((_,i)=>`ข้อ ${i+1}`), datasets:[{
+                    data:stats.satItemScores,
+                    backgroundColor:stats.satItemScores.map(v=>{
+                        const n=parseFloat(v);
+                        return n>=4.5?'rgba(22,163,74,.85)':n>=3.5?'rgba(34,197,94,.75)':'rgba(134,239,172,.8)';
+                    }),
+                    borderRadius:5, borderSkipped:false
+                }]},
+                options:{ responsive:true, maintainAspectRatio:false,
+                    plugins:{ legend:{display:false},
+                        datalabels:{ anchor:'end',align:'top',color:'#15803d',font:{weight:'bold',size:9},formatter:v=>parseFloat(v).toFixed(2) },
+                        tooltip:{callbacks:{title:ctx=>`${ctx[0].dataIndex+1}. ${satisfactionQuestions[ctx[0].dataIndex]}`}}
+                    },
+                    scales:{ y:{beginAtZero:true,max:5,grid:{color:'rgba(0,0,0,.04)'},ticks:{stepSize:1,font:{size:10}}}, x:{grid:{display:false},ticks:{font:{size:9}}} }
+                }
+            });
 
-            /* Pre/Post */
             new Chart(destroy('chartPrePost'),{
                 type:'bar',
                 data:{ labels:['Pre-test','Post-test'], datasets:[{ data:[stats.avgPre,stats.avgPost], backgroundColor:['rgba(239,68,68,.8)','rgba(34,197,94,.8)'], borderRadius:8, borderSkipped:false }]},
@@ -1177,7 +1151,6 @@ new Chart(destroy('chartSat'),{
                 }
             });
 
-            /* Sex */
             const m=ua.filter(u=>u.sex==='ชาย').length, f=ua.filter(u=>u.sex==='หญิง').length, tot=m+f;
             new Chart(destroy('chartSex'),{
                 type:'pie',
@@ -1186,7 +1159,6 @@ new Chart(destroy('chartSat'),{
                     plugins:{ datalabels:{ color:'#fff',font:{weight:'bold',size:11}, formatter:v=>tot>0&&v>0?`${v}\n(${(v/tot*100).toFixed(1)}%)`:''}}}
             });
 
-            /* Age */
             const ag={'20-29':0,'30-39':0,'40-49':0,'50+':0};
             ua.forEach(u=>{ if(u.age<30)ag['20-29']++; else if(u.age<40)ag['30-39']++; else if(u.age<50)ag['40-49']++; else ag['50+']++; });
             new Chart(destroy('chartAge'),{
